@@ -10,11 +10,13 @@ INSTANCE="mybook"
 MPDFDIR="/var/www/html/mPDF-v6.1.0"
 MPDFINSTALL="No"
 
-echo "This will install Booktype on your local machine for development"
+clear
+echo "This will install a development instance of Booktype on your local machine."
+echo
+echo "Do not run as root, but you might be prompted for the sudo authentication."
 echo
 
 # Get values from user
-clear
 echo Please provide some information
 echo
 echo Name of database? \(Hit Enter for \'$DBNAME\'\)
@@ -104,7 +106,7 @@ done
 sudo apt-get install postgresql git-core python-dev python-pip libjpeg-dev libpq-dev libxml2-dev libxslt-dev rabbitmq-server redis-server tidy calibre 
 
 # create postgresql booktype user
-echo Creating new user in database.
+echo Creating new user in postgresql.
 echo Please provide password.
 sudo -u postgres createuser -SDRP $DBUSER
 # now you will be prompted for a password
@@ -112,6 +114,13 @@ sudo -u postgres createuser -SDRP $DBUSER
 # create postgresql database
 echo Creating database
 sudo -u postgres createdb -E utf8 -T template0 -O $DBUSER $DBNAME
+
+# to drop the database and the user
+# Become system user postgresql: 
+# sudo -su postgres
+# and then: 
+# dropdb 'booktype-db'
+# dropuser 'booktype-user'
 
 # restart postgresql
 sudo service postgresql restart
@@ -128,7 +137,7 @@ fi
 # Create directory for your installation, if non-existent
 if [ ! -d "$INSTALLDIR" ]; then
     echo Creating directory $INSTALLDIR;
-    sudo mkdir -p $INSTALLDIR;
+    mkdir -p $INSTALLDIR;
 fi
 echo Changing to $INSTALLDIR
 cd $INSTALLDIR
@@ -160,44 +169,42 @@ echo
 echo "--------------------------------------
 Now Change settings manually.
 
-1. Change the base.py file
+1. Change the base.py file to...
 
-    sudo nano ${INSTALLDIR}/${INSTANCE}/${INSTANCE}_site/settings/base.py
+sudo nano ${INSTALLDIR}/${INSTANCE}/${INSTANCE}_site/settings/base.py
+
+EXPORT_ALLOWED_HOSTS = ['127.0.0.1']
+
+ADMINS = (
+    ('Your Name', 'your_email@domain.com'),
+)
+
+PROFILE_ACTIVE = 'dev'
+MPDF_DIR = '/var/www/html/mPDF-v6.1.0'
+
+2. Change the dev.py file to...
+
+sudo nano ${INSTALLDIR}/${INSTANCE}/${INSTANCE}_site/settings/dev.py
+
+THIS_BOOKTYPE_SERVER = '127.0.0.1:8000'
+BOOKTYPE_URL = 'http://{}'.format(THIS_BOOKTYPE_SERVER)
+
+STATIC_URL = '{}/static/'.format('')
+DATA_URL = '{}/data/'.format('')
     
-    ADMINS = (
-        # ('Your Name', 'your_email@domain.com'),
-    )
+MPDF_DIR = '${MPDFDIR}'
+MPDF_SCRIPT = '${INSTALLDIR}/${INSTANCE}/booktype2mpdf.php'
 
-    MPDF_DIR = '/var/www/html/mPDF-v6.1.0'
-    PROFILE_ACTIVE = 'dev'
-    BOOKTYPE_SITE_NAME = 'Booktype site'
-    DEFAULT_PUBLISHER = "mpdf"
-
-    THIS_BOOKTYPE_SERVER = '127.0.0.1:8000'
-    # BOOKTYPE_URL = ''
-    BOOKTYPE_URL = 'http://{}'.format(THIS_BOOKTYPE_SERVER)
-
-    STATIC_URL = '{}/static/'.format('')
-    DATA_URL = '{}/data/'.format('')
-
-2. Change the dev.py file
-
-    sudo nano ${INSTALLDIR}/${INSTANCE}/${INSTANCE}_site/settings/dev.py
-
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': '${DBNAME}',
-            'USER': '${DBUSER}',
-            'PASSWORD': 'password-db',
-            'HOST': 'localhost',
-            'PORT': '',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': '${DBNAME}',
+        'USER': '${DBUSER}',
+        'PASSWORD': 'YOUR PASSWORD HERE',
+        'HOST': 'localhost',
+        'PORT': '',
     }
-    
-    # And in the same change these settings    
-    
-    MPDF_DIR = '${MPDFDIR}'
-    MPDF_SCRIPT = '${INSTALLDIR}/${INSTANCE}/booktype2mpdf.php'
+}
+
     
 "

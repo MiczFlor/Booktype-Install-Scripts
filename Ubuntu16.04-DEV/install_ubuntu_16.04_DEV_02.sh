@@ -58,6 +58,7 @@ cd $INSTANCE
 python manage.py migrate
 
 # Create superuser for login
+echo Creating administrator login
 python manage.py createsuperuser
 
 # Update
@@ -66,6 +67,7 @@ python manage.py update_default_roles
 
 # start celery in the background
 nohup python manage.py celery worker --concurrency=10 &
+
 # Start webserver
 python manage.py runserver
 # This will show the link where you can access Booktype in your browser (http://127.0.0.1:8000/)
@@ -76,4 +78,5 @@ python manage.py runserver
 #    cd $INSTALLDIR
 #    source venv/bin/activate
 #    cd $INSTANCE
+#    nohup python manage.py celery worker --concurrency=10 &
 #    python manage.py runserver
