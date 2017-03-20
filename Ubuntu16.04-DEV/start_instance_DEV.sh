@@ -48,6 +48,10 @@ do
 done
 
 cd $INSTALLDIR
+# start the virtual environment
 source venv/bin/activate
 cd $INSTANCE
+# start celery in the background
+nohup python manage.py celery worker --concurrency=10 &
+# start the webserver
 python manage.py runserver

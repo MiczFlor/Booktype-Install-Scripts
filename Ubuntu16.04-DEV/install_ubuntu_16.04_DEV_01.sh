@@ -10,6 +10,9 @@ INSTANCE="mybook"
 MPDFDIR="/var/www/html/mPDF-v6.1.0"
 MPDFINSTALL="No"
 
+echo "This will install Booktype on your local machine for development"
+echo
+
 # Get values from user
 clear
 echo Please provide some information
@@ -155,9 +158,9 @@ echo Creating instance $INSTANCE
 
 echo
 echo "--------------------------------------
-Now Change settings manually
+Now Change settings manually.
 
-1. base file
+1. Change the base.py file
 
     sudo nano ${INSTALLDIR}/${INSTANCE}/${INSTANCE}_site/settings/base.py
     
@@ -170,8 +173,14 @@ Now Change settings manually
     BOOKTYPE_SITE_NAME = 'Booktype site'
     DEFAULT_PUBLISHER = "mpdf"
 
+    THIS_BOOKTYPE_SERVER = '127.0.0.1:8000'
+    # BOOKTYPE_URL = ''
+    BOOKTYPE_URL = 'http://{}'.format(THIS_BOOKTYPE_SERVER)
 
-2. dev file
+    STATIC_URL = '{}/static/'.format('')
+    DATA_URL = '{}/data/'.format('')
+
+2. Change the dev.py file
 
     sudo nano ${INSTALLDIR}/${INSTANCE}/${INSTANCE}_site/settings/dev.py
 
