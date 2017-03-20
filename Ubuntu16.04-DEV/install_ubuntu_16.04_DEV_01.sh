@@ -181,6 +181,7 @@ ADMINS = (
 
 PROFILE_ACTIVE = 'dev'
 MPDF_DIR = '/var/www/html/mPDF-v6.1.0'
+PANDOC_PATH = '/usr/bin/pandoc'
 
 2. Change the dev.py file to...
 
