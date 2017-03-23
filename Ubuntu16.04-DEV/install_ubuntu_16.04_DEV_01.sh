@@ -6,9 +6,11 @@ DBNAME="booktype-db"
 DBUSER="booktype-user"
 INSTALLDIR=$HOME"/booktype2"
 GITREPO="https://github.com/sourcefabric/Booktype.git"
+GITREPOTHEMES="https://github.com/booktype/booktype-themes.git"
 INSTANCE="mybook"
 MPDFDIR="/var/www/html/mPDF-v6.1.0"
 MPDFINSTALL="No"
+THEMESINSTALL="No"
 
 clear
 echo "This will install a development instance of Booktype on your local machine."
@@ -38,6 +40,11 @@ echo Git repository URL? \(Hit Enter for \'$GITREPO\'\)
 read INPUT
 if [ -n "$INPUT" ]; then
     GITREPO=$INPUT
+fi
+echo Git THEMES repository URL? \(Hit Enter for \'$GITREPOTHEMES\'\)
+read INPUT
+if [ -n "$INPUT" ]; then
+    GITREPOTHEMES=$INPUT
 fi
 echo Name of Booktype instance? \(Hit Enter for \'$INSTANCE\'\)
 read INPUT
@@ -69,6 +76,27 @@ do
         *) echo "Invalid selection";;
     esac
 done
+
+echo 
+echo Download and install additional themes?
+ANSWER=("Yes" "No")
+select THEMESINSTALL in "${ANSWER[@]}"
+do
+    case $THEMESINSTALL in
+        "Yes")
+            # continue
+            echo Themes will be installed.
+            break
+            ;;
+        "No")
+            # Exit script
+            echo Themes will not be installed.
+            break
+            ;;
+        *) echo "Invalid selection";;
+    esac
+done
+
 echo
 echo Your installation will use:
 echo 
@@ -79,6 +107,8 @@ echo Git repository : $GITREPO
 echo Booktype instance : $INSTANCE
 echo Path to mpdf : $MPDFDIR
 echo Install mpdf? : $MPDFINSTALL
+echo Install themes? : $THEMESINSTALL
+
 echo 
 echo Correct and continue?
 ANSWER=("Yes" "No")
@@ -164,6 +194,17 @@ pip install -r Booktype/requirements/prod.txt
 # create instance
 echo Creating instance $INSTANCE
 ./Booktype/scripts/createbooktype --database postgresql $INSTANCE
+
+# download and install Themes from github 
+if [ $THEMESINSTALL = "Yes" ]; then
+    echo Installing additional themes
+    echo Clonging git repo $GITREPOTHEMES
+    git clone $GITREPOTHEMES
+    // copying theme folders to Booktype themes
+    cp -R booktype-themes/* Booktype/lib/booktype/skeleton/themes/
+    rm -r Booktype/lib/booktype/skeleton/themes/AA_fontconfig/
+    rm Booktype/lib/booktype/skeleton/themes/README.md 
+fi
 
 echo
 echo "--------------------------------------
